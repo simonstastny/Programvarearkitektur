@@ -1,9 +1,9 @@
 package no.ntnu.swa.a13;
 
 public class DamageEvent extends Event {
-	Player target;
-	Player source;
-	float damage;
+	private Player target;
+	private Player source;
+	private float damage;
 	
 	public Player getTarget() {
 		return target;

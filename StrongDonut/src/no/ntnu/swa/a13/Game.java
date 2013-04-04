@@ -2,8 +2,7 @@ package no.ntnu.swa.a13;
 
 import java.util.Vector;
 
-import no.ntnu.swa.a13.Player.Status;
-import no.ntnu.swa.a13.State.GameStatus;
+import no.ntnu.swa.a13.Player.PlayerStatus;
 
 public class Game implements Runnable {
 	// constants
@@ -11,14 +10,19 @@ public class Game implements Runnable {
 	public static final float FORCE_DEFAULT = 50;
 	public static final float ANGLE_DEFAULT = 45;
 	
+	enum GameStatus {
+		GAME_OVER, ACTIVE;
+	}
+	
+	private GameStatus status;
+	
 	// fields
-	Vector<Player> players;
-	
-	State currentState;
-	
+	Vector<Player> activePlayers;
+	Vector<Player> deadPlayers;
+		
 	Score score;
 	
-	Strategy strategy;
+	private final Strategy strategy;
 
 	public Game(int numPlayers, Strategy strategy) {
 		this.strategy = strategy;
@@ -26,23 +30,25 @@ public class Game implements Runnable {
 		this.score = new Score();
 		
 		// generate players
-		this.players = new Vector<Player>(numPlayers);
-		for(int i = 0; i < numPlayers; i++) {
-			players.add(new Player(i, null)); //FIXME coordinates generation
-		}
+		this.activePlayers = new Vector<Player>(numPlayers);
+		this.deadPlayers = new Vector<Player>(numPlayers);
 		
-		// generate state sequence and take the first one as initial
-		this.currentState = strategy.generateStates(players).firstElement();
-	}
+		for(int i = 0; i < numPlayers; i++) {
+			activePlayers.add(new Player(i, null)); //FIXME coordinates generation
+		}
+			}
 		
 	public void handleEvent(Event event) {
 		if(event instanceof DamageEvent) {
 			DamageEvent damageEvent = (DamageEvent) event;
 			
-			damageEvent.getTarget().causeDamage(damageEvent.getDamage());
+			Player target = damageEvent.getTarget();
 			
-			if(damageEvent.getTarget().status == Status.DESTROYED) {
-				currentState.fixSequence();
+			target.causeDamage(damageEvent.getDamage());
+			
+			if(target.getStatus() == PlayerStatus.DESTROYED) {
+				activePlayers.remove(target);
+				deadPlayers.add(target);
 			}
 		}
 	}
@@ -50,15 +56,32 @@ public class Game implements Runnable {
 	@Override
 	public void run() {
 		// while not GAME_OVER, iterate over players and let them play
-		while(currentState.getStatus() != GameStatus.GAME_OVER)	{
-			currentState = currentState.getNext();
+		while(status != GameStatus.GAME_OVER)	{
+			//FIXME
 			
 			//FIXME get user action...
 			//FIXME fire events..
 			
-			strategy.checkGameStatus(currentState);
+			strategy.checkGameStatus(this);
 		}
+	}
+
+	public Vector<Player> getActivePlayers() {
+		return activePlayers;
+	}
+
+	public Vector<Player> getDeadPlayers() {
+		return deadPlayers;
+	}
+
+	public GameStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(GameStatus status) {
+		this.status = status;
 	}
 	
 	
+
 }

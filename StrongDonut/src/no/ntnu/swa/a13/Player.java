@@ -3,20 +3,20 @@ package no.ntnu.swa.a13;
 import com.badlogic.gdx.math.Vector2;
 
 public class Player {
-	Status status;
+	private PlayerStatus status;
 	
-	public enum Status {
+	public enum PlayerStatus {
 		DESTROYED, ALIVE;
 	}
 	
-	Vector2 coordinates;
+	private Vector2 coordinates;
 	
-	int id;
+	private int id;
 		
-	float force;
-	float angle;
+	private float force;
+	private float angle;
 	
-	float health;
+	private float health;
 
 	/**
 	 * 
@@ -32,7 +32,7 @@ public class Player {
 		this.force = Game.HEALTH_MAX;
 		this.angle = Game.HEALTH_MAX;
 		
-		this.status = Status.ALIVE;
+		this.status = PlayerStatus.ALIVE;
 	}
 	
 	/**
@@ -43,7 +43,11 @@ public class Player {
 		health = health - damage;
 		
 		if (health <= 0) {
-			status = Status.DESTROYED;
+			status = PlayerStatus.DESTROYED;
 		}
+	}
+
+	public PlayerStatus getStatus() {
+		return status;
 	}
 }
