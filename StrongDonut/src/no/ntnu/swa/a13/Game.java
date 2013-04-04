@@ -1,8 +1,10 @@
 package no.ntnu.swa.a13;
 
+import java.util.Iterator;
 import java.util.Vector;
 
 import no.ntnu.swa.a13.Player.PlayerStatus;
+import no.ntnu.swa.a13.util.RingIterator;
 
 public class Game implements Runnable {
 	// constants
@@ -56,7 +58,13 @@ public class Game implements Runnable {
 	@Override
 	public void run() {
 		// while not GAME_OVER, iterate over players and let them play
+		
+		Iterator<Player> playerIter = new RingIterator<Player>(activePlayers);
+		
 		while(status != GameStatus.GAME_OVER)	{
+			
+			Player player = playerIter.next();
+			
 			//FIXME
 			
 			//FIXME get user action...
