@@ -6,7 +6,7 @@ import java.util.Vector;
 import no.ntnu.swa.a13.Player.PlayerStatus;
 import no.ntnu.swa.a13.util.RingIterator;
 
-public class Game implements Runnable {
+public class Game implements Runnable, GameEventListener {
 	// constants
 	public static final float HEALTH_MAX = 100;
 	public static final float FORCE_DEFAULT = 50;
@@ -64,9 +64,7 @@ public class Game implements Runnable {
 		while(status != GameStatus.GAME_OVER)	{
 			
 			Player player = playerIter.next();
-			
-			//FIXME
-			
+
 			//FIXME get user action...
 			//FIXME fire events..
 			
