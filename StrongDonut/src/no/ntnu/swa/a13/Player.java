@@ -28,9 +28,9 @@ public class Player {
 		this.id = id;
 		this.coordinates = coordinates;
 		
-		this.health = Game.HEALTH_MAX;
-		this.force = Game.HEALTH_MAX;
-		this.angle = Game.HEALTH_MAX;
+		this.health = GameLogic.HEALTH_MAX;
+		this.force = GameLogic.HEALTH_MAX;
+		this.angle = GameLogic.HEALTH_MAX;
 		
 		this.status = PlayerStatus.ALIVE;
 	}

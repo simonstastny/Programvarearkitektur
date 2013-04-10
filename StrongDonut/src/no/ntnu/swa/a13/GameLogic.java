@@ -6,7 +6,7 @@ import java.util.Vector;
 import no.ntnu.swa.a13.Player.PlayerStatus;
 import no.ntnu.swa.a13.util.RingIterator;
 
-public class Game implements Runnable, GameEventListener {
+public class GameLogic implements Runnable, GameEventListener {
 	// constants
 	public static final float HEALTH_MAX = 100;
 	public static final float FORCE_DEFAULT = 50;
@@ -26,7 +26,7 @@ public class Game implements Runnable, GameEventListener {
 	
 	private final Strategy strategy;
 
-	public Game(int numPlayers, Strategy strategy) {
+	public GameLogic(int numPlayers, Strategy strategy) {
 		this.strategy = strategy;
 		
 		this.score = new Score();

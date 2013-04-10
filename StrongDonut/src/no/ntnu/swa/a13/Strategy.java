@@ -7,6 +7,6 @@ public abstract class Strategy {
 	 * @param game
 	 * @return true if this game is over
 	 */
-	abstract void checkGameStatus(Game game);
+	abstract void checkGameStatus(GameLogic game);
 
 }
