@@ -3,6 +3,8 @@ package no.ntnu.swa.a13;
 import no.ntnu.swa.a13.screens.*;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Matrix4;
 //import com.badlogic.gdx.Gdx;
 //import com.badlogic.gdx.graphics.GL10;
 //import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -18,23 +20,54 @@ public class MyGdxGame extends Game {
 //	private Texture texture;
 //	private Sprite sprite;
 	
-	MainMenuScreen mainMenuScreen;
-	OptionsScreen optionsScreen;
-	GameScreen gameScreen;	
 	
-	//Because it is easier to make and move code than the other way around
-	//it might look a bit nasty here for a while - Sindre
-	//At some point I will need to relinquish my love for global variables :(
+//The different menus/ screens are made here, and created in create()
+	public static MainMenuScreen mainMenuScreen;
+	public static OptionsScreen optionsScreen;
+	public static GameScreen gameScreen;
 	
-	//Great discoveries made, making a separate folder for screens
+//The lovely "global" variables will be made here, and created in create()
+	//Scaling factor for box2d to make physics more plausible
+	public static float b2dScale = 0.05f;
+	public static Matrix4 scalingMatrix;
+	
+	//the Real width and height of the screen
+	public static int wR;
+	public static int hR;
+	//Scaled dimensions for the camera
+	public static float w;
+	public static float h;
+	
+	
+	
+//Because it is easier to make and move code than the other way around
+//it might look a bit nasty here for a while - Sindre
+//At some point I will need to relinquish my love for global variables :(
+	
 	
 	@Override
-	public void create() {		
+	public void create() {
+		//the Real width and height of the screen
+		wR = Gdx.graphics.getWidth();
+		hR = Gdx.graphics.getHeight();
 		
+		//Scaling width and height
+		w = wR*b2dScale;
+		h = hR*b2dScale;
+		//This matrix is needed to render smaller objects without losing details
+		scalingMatrix = new Matrix4();
+		scalingMatrix.setToScaling(b2dScale, b2dScale, 1);
+		
+		
+	//Screens made after the other parts of the game have been created, this is important
+	//because of the 'static' implementation, making the screens before the variables have
+	//values sounds like a bad idea
 		mainMenuScreen = new MainMenuScreen(this);
 		optionsScreen = new OptionsScreen(this);
 		gameScreen = new GameScreen(this);
 		
+	//The following call sets the initial screen, and it will start rendering
+	//this is the last thing to happen in create()
 		setScreen(mainMenuScreen);
 		
 //		float w = Gdx.graphics.getWidth();
