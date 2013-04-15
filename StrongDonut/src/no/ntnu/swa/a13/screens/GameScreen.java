@@ -27,7 +27,6 @@ public class GameScreen implements Screen {
 	
 	public GameScreen(MyGdxGame gameRef){
 		game = gameRef;
-		game = gameRef;
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, MyGdxGame.w, MyGdxGame.h);
 		batch = new SpriteBatch();
