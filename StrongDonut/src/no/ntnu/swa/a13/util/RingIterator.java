@@ -3,8 +3,8 @@ package no.ntnu.swa.a13.util;
 import java.util.Iterator;
 import java.util.List;
 
-public class RingIterator <E> implements Iterator<E> {
-	
+public class RingIterator<E> implements Iterator<E> {
+
 	List<E> list;
 	int position;
 
@@ -29,8 +29,4 @@ public class RingIterator <E> implements Iterator<E> {
 		this.list = list;
 		this.position = 0;
 	}
-
-	
-	
-	
 }
