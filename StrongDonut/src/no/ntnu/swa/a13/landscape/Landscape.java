@@ -2,20 +2,21 @@ package no.ntnu.swa.a13.landscape;
 
 import java.util.List;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Fixture;
 
 public class Landscape {
 
-	public static final int SLICE_WIDTH = 10;
+	public static final int SLICE_WIDTH = 3;
 
-	protected final List<SliceShape> slices;
+	protected final List<Rectangle> slices;
 
-	public List<SliceShape> getSlices() {
+	public List<Rectangle> getSlices() {
 		return slices;
 	}
 
-	void eatLandscape(Vector2 groundZero, float force) {
+	public void eatLandscape(Vector2 groundZero, float force) {
 		
 		float exploLeftX = groundZero.x - force;
 		float exploRightX = groundZero.x + force;
@@ -24,35 +25,32 @@ public class Landscape {
 		int lastSlice = (int) Math.ceil(exploRightX / SLICE_WIDTH);
 
 		for (int i = firstSlice; i <= lastSlice; i++) {
-			SliceShape slice = slices.get(i);
-
-			eatCorner(groundZero, force, slice.getLeftTop());
-			eatCorner(groundZero, force, slice.getRightTop());
-
-			slice.set(new Vector2[] {
-					slice.getLeftBottom(),
-					slice.getLeftTop(),
-					slice.getRightBottom(),
-					slice.getRightTop()
-					});
+			Rectangle slice = slices.get(i);
+			
+			eatRectangle(groundZero, force, slice);
 		}
 
 	}
 
-	void eatCorner(Vector2 center, float diameter, Vector2 corner) {
-		double p = Math.pow(diameter, 2) - Math.pow((center.x - corner.x), 2);
+	void eatRectangle(Vector2 center, float diameter, Rectangle rect) {
+		double p = Math.pow(diameter, 2) - Math.pow((center.x - rect.x), 2);
+		
+		float newY = (float) Math.ceil(center.y - Math.sqrt(p));
 
-		if (p >= 0) {
-			corner.y = (float) Math.ceil(center.y - Math.sqrt(p));
+		if (p >= 0 && newY < rect.height) {
+			rect.height = newY;
 		}
 	}
 
-	public Landscape(List<SliceShape> slices) {
+	public Landscape(List<Rectangle> slices) {
 		super();
 		this.slices = slices;
 	}
 	
-	public List<Body> getBodies() {
+	public List<Fixture> getFixtures() {
+		
+		
+		
 		return null; //TODO
 	}
 	

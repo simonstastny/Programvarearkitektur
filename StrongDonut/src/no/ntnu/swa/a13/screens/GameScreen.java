@@ -1,6 +1,9 @@
 package no.ntnu.swa.a13.screens;
 
-import no.ntnu.swa.a13.*;
+import no.ntnu.swa.a13.MyGdxGame;
+import no.ntnu.swa.a13.landscape.Landscape;
+import no.ntnu.swa.a13.landscape.LandscapeFactory;
+import no.ntnu.swa.a13.landscape.SimonsStupidGenerator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -8,85 +11,146 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.World;
 
-public class GameScreen implements Screen {	
+public class GameScreen implements Screen {
 	
+	
+	float gone = 0; //FIXME debug simon
+
+	World world;
+
 	MyGdxGame game;
-	
-	//The camera displays a given area across the entire screen.
+
+	// The camera displays a given area across the entire screen.
 	private OrthographicCamera camera;
-	
-	//the SpriteBatch takes care of rendering images
+
+	// the SpriteBatch takes care of rendering images
 	private SpriteBatch batch;
-	
-	//Menu elements need textures
+	private PolygonSpriteBatch polygonBatch;
+	private ShapeRenderer renderer;
+
+	// Menu elements need textures
 	private Texture newGameTex;
 	private TextureRegion sketchRegion;
 	
-	public GameScreen(MyGdxGame gameRef){
+	private Landscape landscape;
+
+	public GameScreen(MyGdxGame gameRef) {
 		game = gameRef;
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, MyGdxGame.w, MyGdxGame.h);
 		batch = new SpriteBatch();
+		polygonBatch = new PolygonSpriteBatch();
+		renderer = new ShapeRenderer();
+		renderer.setTransformMatrix(MyGdxGame.scalingMatrix);
 		batch.setTransformMatrix(MyGdxGame.scalingMatrix);
-		
+
 		newGameTex = new Texture(Gdx.files.internal("data/help_res/gamesketch_1.png"));
-		newGameTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);//not sure if filter is needed
-		
+		newGameTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);// not sure if filter is needed
 		sketchRegion = new TextureRegion(newGameTex, 0, 0, 1024, 512);
+
+		world = new World(new Vector2(0, 0), false); // FIXME what does this
+														// mean
+
+		landscape = LandscapeFactory.makeLandscape(new SimonsStupidGenerator());
+
+		int sliceCounter = 0;
+		BodyDef bd = new BodyDef();
+		bd.position.y = 0;
+		bd.type = BodyType.StaticBody;
+		
+		for (Rectangle slice : landscape.getSlices()) {
+			
+			bd.position.x = sliceCounter++*Landscape.SLICE_WIDTH;
+			
+			Body b = world.createBody(bd);
+			
+			//FIXME create fixtures!!!!
+			
+			//b.createFixture(new , 1500); //FIXME density
+		}
 	}
 
 	@Override
 	public void render(float delta) {
+		
+		// FIXME just a debug thingy
+		gone += delta;
+		
+		if(gone > 5) {
+			Vector2 v = new Vector2(100,130);
+			landscape.eatLandscape(v, 50);
+		}
+		
+		//FIXME end of debug thingy
+		
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+
+//		batch.setProjectionMatrix(camera.combined);
+//
+//		batch.begin();
+//		batch.draw(sketchRegion, 0, 0, MyGdxGame.wR, MyGdxGame.hR);
+//		batch.end();
+		renderer.setProjectionMatrix(camera.combined);
 		
-		batch.setProjectionMatrix(camera.combined);
+		renderer.begin(ShapeType.Rectangle);
 		
-		batch.begin();
-		batch.draw(sketchRegion, 0, 0, MyGdxGame.wR, MyGdxGame.hR);
-		batch.end();
+		for(Rectangle rect : landscape.getSlices()) {
+			renderer.rect(rect.x,rect.y,rect.width,rect.height);
+		}
+		
+		renderer.end();
 		
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void resize(int width, int height) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void hide() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void pause() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void resume() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void dispose() {
 		batch.dispose();
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

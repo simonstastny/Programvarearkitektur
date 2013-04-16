@@ -10,9 +10,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 public class MainMenuScreen implements Screen {
+
 	
 	// A the game class, it will hold some cross-screen relevant variables
 	//but as long as those variables are static, it won't be needed
@@ -27,9 +29,6 @@ public class MainMenuScreen implements Screen {
 	//Menu elements need textures
 	private Texture newGameTex;
 	private TextureRegion continueButton, newGameButton, optionsButton, exitButton;
-	
-	
-	
 	
 	public MainMenuScreen(MyGdxGame gameRef){
 		game = gameRef;
@@ -50,6 +49,7 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
+		
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		batch.setProjectionMatrix(camera.combined);
