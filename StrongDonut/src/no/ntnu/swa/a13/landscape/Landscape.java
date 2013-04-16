@@ -3,6 +3,7 @@ package no.ntnu.swa.a13.landscape;
 import java.util.List;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 
 public class Landscape {
 
@@ -10,7 +11,7 @@ public class Landscape {
 
 	protected final List<SliceShape> slices;
 
-	public List<SliceShape> getBodies() {
+	public List<SliceShape> getSlices() {
 		return slices;
 	}
 
@@ -50,4 +51,9 @@ public class Landscape {
 		super();
 		this.slices = slices;
 	}
+	
+	public List<Body> getBodies() {
+		return null; //TODO
+	}
+	
 }
