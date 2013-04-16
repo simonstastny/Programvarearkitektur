@@ -1,30 +1,21 @@
 package no.ntnu.swa.a13.landscape;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 
 public class Landscape {
 
 	public static final int SLICE_WIDTH = 10;
 
-	final List<SliceShape> slices;
+	protected final List<SliceShape> slices;
 
-	public List<Body> getBodies() {
-		List<Body> bodies = new ArrayList<Body>();
-
-		for (SliceShape shape : slices) {
-			// FIXME make fixture
-			// FIXME make body
-		}
-
-		return bodies;
+	public List<SliceShape> getBodies() {
+		return slices;
 	}
 
 	void eatLandscape(Vector2 groundZero, float force) {
-
+		
 		float exploLeftX = groundZero.x - force;
 		float exploRightX = groundZero.x + force;
 
