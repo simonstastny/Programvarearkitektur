@@ -3,6 +3,7 @@ package no.ntnu.swa.a13.screens;
 import no.ntnu.swa.a13.MyGdxGame;
 import no.ntnu.swa.a13.landscape.Landscape;
 import no.ntnu.swa.a13.landscape.LandscapeFactory;
+import no.ntnu.swa.a13.landscape.LandscapeGenerator;
 import no.ntnu.swa.a13.landscape.SimonsStupidGenerator;
 
 import com.badlogic.gdx.Gdx;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -25,6 +27,8 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public class GameScreen implements Screen {
 	
+	public static final int WIDTH = Gdx.graphics.getWidth();
+	public static final int HEIGHT = Gdx.graphics.getHeight();
 	
 	float gone = 0; //FIXME debug simon
 
@@ -58,7 +62,7 @@ public class GameScreen implements Screen {
 
 		newGameTex = new Texture(Gdx.files.internal("data/help_res/gamesketch_1.png"));
 		newGameTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);// not sure if filter is needed
-		sketchRegion = new TextureRegion(newGameTex, 0, 0, 1024, 512);
+		sketchRegion = new TextureRegion(newGameTex, 0, 0, WIDTH, 512);
 
 		world = new World(new Vector2(0, 0), false); // FIXME what does this
 														// mean
@@ -85,23 +89,8 @@ public class GameScreen implements Screen {
 	@Override
 	public void render(float delta) {
 		
-		// FIXME just a debug thingy
-		gone += delta;
-		
-		if(gone > 5) {
-			Vector2 v = new Vector2(100,130);
-			landscape.eatLandscape(v, 50);
-		}
-		
-		//FIXME end of debug thingy
-		
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
-//		batch.setProjectionMatrix(camera.combined);
-//
-//		batch.begin();
-//		batch.draw(sketchRegion, 0, 0, MyGdxGame.wR, MyGdxGame.hR);
-//		batch.end();
 		renderer.setProjectionMatrix(camera.combined);
 		
 		renderer.begin(ShapeType.Rectangle);
@@ -111,8 +100,11 @@ public class GameScreen implements Screen {
 		}
 		
 		renderer.end();
-		
-		// TODO Auto-generated method stub
+
+		//FIXME wifikundace
+		if(Gdx.input.isTouched()){
+			landscape.deform(new Vector2(Gdx.input.getX(),HEIGHT-Gdx.input.getY()), 50);
+		}
 
 	}
 

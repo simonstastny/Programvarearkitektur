@@ -8,7 +8,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 
 public class Landscape {
 
-	public static final int SLICE_WIDTH = 3;
+	public static final int SLICE_WIDTH = 1;
 
 	protected final List<Rectangle> slices;
 
@@ -16,7 +16,7 @@ public class Landscape {
 		return slices;
 	}
 
-	public void eatLandscape(Vector2 groundZero, float force) {
+	public void deform(Vector2 groundZero, float force) {
 		
 		float exploLeftX = groundZero.x - force;
 		float exploRightX = groundZero.x + force;
@@ -25,11 +25,13 @@ public class Landscape {
 		int lastSlice = (int) Math.ceil(exploRightX / SLICE_WIDTH);
 
 		for (int i = firstSlice; i <= lastSlice; i++) {
-			Rectangle slice = slices.get(i);
 			
-			eatRectangle(groundZero, force, slice);
+			if(i < 0 || i >= slices.size()) {
+				continue;
+			}
+			
+			eatRectangle(groundZero, force, slices.get(i));
 		}
-
 	}
 
 	void eatRectangle(Vector2 center, float diameter, Rectangle rect) {
@@ -43,14 +45,10 @@ public class Landscape {
 	}
 
 	public Landscape(List<Rectangle> slices) {
-		super();
 		this.slices = slices;
 	}
 	
 	public List<Fixture> getFixtures() {
-		
-		
-		
 		return null; //TODO
 	}
 	
