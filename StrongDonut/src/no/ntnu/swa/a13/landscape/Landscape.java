@@ -11,10 +11,13 @@ public class Landscape {
 	public static final int SLICE_WIDTH = 1;
 
 	protected final List<Rectangle> slices;
+	
 
 	public List<Rectangle> getSlices() {
 		return slices;
 	}
+	
+
 
 	public void deform(Vector2 groundZero, float force) {
 		
