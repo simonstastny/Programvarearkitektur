@@ -158,7 +158,6 @@ public class GameScreen implements Screen {
 			public void preSolve(Contact contact, Manifold oldManifold) {
 				if(PhysicsHelper.wasHit(contact)) {
 					landscape.deform(ball.getPosition(), 50);
-					ballExists = false;
 				}
 				
 			}
