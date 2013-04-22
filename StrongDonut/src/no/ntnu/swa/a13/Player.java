@@ -76,4 +76,8 @@ public class Player {
 	public void setCoordinates(Vector2 coordinates){
 		this.coordinates = coordinates;
 	}
+	
+	public int getId() {
+		return id;
+	}
 }

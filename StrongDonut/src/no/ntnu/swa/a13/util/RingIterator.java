@@ -29,4 +29,9 @@ public class RingIterator<E> implements Iterator<E> {
 		this.list = list;
 		this.position = 0;
 	}
+	
+	public E get() {
+		position = (position) % list.size();
+		return list.get(position);
+	}
 }

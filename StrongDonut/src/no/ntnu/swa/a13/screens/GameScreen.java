@@ -1,5 +1,10 @@
 package no.ntnu.swa.a13.screens;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import no.ntnu.swa.a13.FreeForAllStrategy;
+import no.ntnu.swa.a13.GameLogic;
 import no.ntnu.swa.a13.MyGdxGame;
 import no.ntnu.swa.a13.PhysicsHelper;
 import no.ntnu.swa.a13.Player;
@@ -39,6 +44,8 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public class GameScreen implements Screen {
 	
+	private GameLogic gameLogic= new  GameLogic(2, new FreeForAllStrategy());
+	
 	public static final int WIDTH = Gdx.graphics.getWidth();
 	public static final int HEIGHT = Gdx.graphics.getHeight();
 	
@@ -47,6 +54,8 @@ public class GameScreen implements Screen {
 	World world;
 
 	MyGdxGame game;
+	
+	BodyFactory bodyFactory;
 	
 
 	// The camera displays a given area across the entire screen.
@@ -71,19 +80,27 @@ public class GameScreen implements Screen {
 	private int catapultMap1stRow = 95;
 	private int catapultMap2ndRow = 545;
 	private float catapultSize = 0.1f; //for scaling down the texture
-	private Vector2 catPos1, catPos2;
 	
 	private Landscape landscape;
 	private Vector2[] landVertices;
 	
 	private int ballSize = 5;
-	private Body ball, landBody, catapult1, catapult2;
+	
 	private Vector2 target, force;
 	private boolean ballExists = false;
 	private boolean destroyBall = false;
 	private boolean ballBeingFired = false;
+	
+	// game bodies
+	private Body ball, landBody, catapult1, catapult2;
+	private List<Body> playerBodies;
 
+	
+	/** ------------------------- */
 	public GameScreen(MyGdxGame gameRef) {
+		
+		bodyFactory = new BodyFactory();
+		
 		game = gameRef;
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, MyGdxGame.w, MyGdxGame.h);
@@ -199,41 +216,18 @@ public class GameScreen implements Screen {
 			}
 		});
 		
+		// initialize players, create catapults
 		
-		//Making the physical part of the catapults		
-		//FIXME move to catapult factory -----------------
-		catPos1 = new Vector2(MyGdxGame.w/8, MyGdxGame.h);
-		catPos2 = new Vector2(MyGdxGame.w*7/8, MyGdxGame.h);
-
-		bd.type = BodyType.DynamicBody;
-		bd.position.x = catPos1.x;
-		bd.position.y =	catPos1.y;
-		bd.angularDamping = 15.0f;
-		catapult1 = world.createBody(bd);
-		bd.position.x = catPos2.x;
-		bd.position.y =	catPos2.y;
-		catapult2 = world.createBody(bd);
-		PolygonShape cataShape = new PolygonShape();
-		FixtureDef fd = new FixtureDef(); //this fixturedef is reused for the projectile "ball"
-		fd.friction = 10.0f;
-		fd.restitution = 0.0f;
-		fd.density = 1.0f;
-		float[] catBodArray = {0,0,catapultWidthPx*catapultSize*MyGdxGame.b2dScale,0,catapultWidthPx*catapultSize*MyGdxGame.b2dScale,catapultHeightPx*catapultSize*MyGdxGame.b2dScale,0,catapultHeightPx*catapultSize*MyGdxGame.b2dScale};
-		cataShape.set(catBodArray);
-		fd.shape = cataShape;
-		catapult1.createFixture(fd);
-		catapult2.createFixture(fd);
-		cataShape.dispose();
-		//FIXME ------------------------------------------
+		initializePlayers();
+		
+		catapult1 = playerBodies.get(0); //FIXME not tidy enough
+		catapult2 = playerBodies.get(1); //FIXME not tidy enough
 		
 		//The ball used for testing will be the new projectile instead
 		//makeBall(MyGdxGame.wR/2,MyGdxGame.hR);
 		
-		target = new Vector2(0,0);
+		target = new Vector2(0,0); //FIXME WTF
 		force = new Vector2(0,0);
-
-		
-		
 	}
 	
 
@@ -371,39 +365,20 @@ public class GameScreen implements Screen {
 			world.destroyBody(ball);
 			ballExists = false;
 		}
+		
+		//Player player = gameLogic.nextPlayer(); //FIXME
+		
 		if(MyGdxGame.activePlayer==0){
-			makeBall((catapult1.getPosition().x+catapult1.getLocalCenter().x), (catapult1.getPosition().y+catapult1.getLocalCenter().y*2));
+			ball = bodyFactory.makeBall(new Vector2((catapult1.getPosition().x+catapult1.getLocalCenter().x), (catapult1.getPosition().y+catapult1.getLocalCenter().y*2)));
 //			ball.applyForce(force,ball.getWorldCenter());
 			ball.applyLinearImpulse(force,ball.getWorldCenter());
 			MyGdxGame.activePlayer=1;
-		}else{
-			makeBall((catapult2.getPosition().x+catapult2.getLocalCenter().x), (catapult2.getPosition().y+catapult2.getLocalCenter().y*2));
+		} else{
+			ball = bodyFactory.makeBall(new Vector2((catapult2.getPosition().x+catapult2.getLocalCenter().x), (catapult2.getPosition().y+catapult2.getLocalCenter().y*2)));
 //			ball.applyForce(-force.x,force.y,ball.getWorldCenter().x,ball.getWorldCenter().y);
 			ball.applyLinearImpulse(-force.x,force.y,ball.getWorldCenter().x,ball.getWorldCenter().y);
 			MyGdxGame.activePlayer=0;
 		}
-		
-	}
-	
-	private void makeBall(float posX, float posY){
-		BodyDef bd = new BodyDef();
-		bd.position.x = posX;
-		bd.position.y = posY;
-		FixtureDef fd = new FixtureDef();
-		bd.type = BodyType.DynamicBody;
-		ball = world.createBody(bd);
-		CircleShape ballShape = new CircleShape();
-		ballShape.setRadius(ballSize*MyGdxGame.b2dScale);
-		fd.shape = ballShape;
-		fd.friction = 1.0f;
-		fd.restitution = 0.0f;
-		fd.density = 10.0f;
-		ball.createFixture(fd);
-		ball.setUserData(PhysicsHelper.BALL);
-		ballShape.dispose();
-		ballExists = true;
-		System.out.println("Catapult1 is at: "+catapult1.getPosition().x+", "+catapult1.getPosition().y);
-		System.out.println("Ball made at: "+ball.getPosition().x+", "+ball.getPosition().y);
 		
 	}
 
@@ -445,10 +420,73 @@ public class GameScreen implements Screen {
 
 	}
 	
-	class CatapultFactory {
+	private void initializePlayers() {	
+		playerBodies = new ArrayList<Body>(gameLogic.getActivePlayers().size());
 		
-		void createCatapult(Player player) {
+		for(Player player : gameLogic.getActivePlayers()) {
+			playerBodies.add(bodyFactory.makeCatapult(player));			
+		}	
+	}
+	
+	class BodyFactory {
+		
+		private Body makeBall(Vector2 vector) {
+			Body ballBody;
 			
+			BodyDef bd = new BodyDef();
+			bd.position.x = vector.x;
+			bd.position.y = vector.y;
+			FixtureDef fd = new FixtureDef();
+			bd.type = BodyType.DynamicBody;
+			ballBody = world.createBody(bd);
+			CircleShape ballShape = new CircleShape();
+			ballShape.setRadius(ballSize*MyGdxGame.b2dScale);
+			fd.shape = ballShape;
+			fd.friction = 1.0f;
+			fd.restitution = 0.0f;
+			fd.density = 10.0f;
+			ballBody.createFixture(fd);
+			ballBody.setUserData(PhysicsHelper.BALL);
+			ballShape.dispose();
+			ballExists = true;
+			System.out.println("Catapult1 is at: "+catapult1.getPosition().x+", "+catapult1.getPosition().y);
+			System.out.println("Ball made at: "+ballBody.getPosition().x+", "+ballBody.getPosition().y);
+			
+			return ballBody;
+			
+		}
+		
+		public Body makeCatapult(Player player) {
+			Body catapult = null;
+			
+			BodyDef bd = new BodyDef();
+			
+			// set position
+			bd.position.x = player.getCoordinates().x;
+			bd.position.y = player.getCoordinates().y;
+
+			bd.type = BodyType.DynamicBody;
+			
+			bd.angularDamping = 15.0f;
+			
+			catapult = world.createBody(bd);
+
+			PolygonShape cataShape = new PolygonShape();
+			
+			FixtureDef fd = new FixtureDef();
+			
+			fd.friction = 10.0f;
+			fd.restitution = 0.0f;
+			fd.density = 1.0f;
+			float[] catBodArray = {0,0,catapultWidthPx*catapultSize*MyGdxGame.b2dScale,0,catapultWidthPx*catapultSize*MyGdxGame.b2dScale,catapultHeightPx*catapultSize*MyGdxGame.b2dScale,0,catapultHeightPx*catapultSize*MyGdxGame.b2dScale};
+			cataShape.set(catBodArray);
+			fd.shape = cataShape;
+			catapult.createFixture(fd);
+			cataShape.dispose();
+			
+			catapult.setUserData(player);
+			
+			return catapult;
 		}
 		
 		
