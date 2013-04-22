@@ -75,10 +75,11 @@ public class GameScreen implements Screen {
 	private Landscape landscape;
 	private Vector2[] landVertices;
 	
-	
+	private int ballSize = 5;
 	private Body ball, landBody, catapult1, catapult2;
 	private Vector2 target, force;
 	private boolean ballExists = false;
+	private boolean destroyBall = false;
 	private boolean ballBeingFired = false;
 
 	public GameScreen(MyGdxGame gameRef) {
@@ -156,9 +157,9 @@ public class GameScreen implements Screen {
 			
 			@Override
 			public void preSolve(Contact contact, Manifold oldManifold) {
-				if(PhysicsHelper.wasHit(contact)) {
-					landscape.deform(ball.getPosition(), 50);
-				}
+//				if(PhysicsHelper.wasHit(contact)) {
+//					landscape.deform(ball.getPosition(), 50);
+//				}
 				
 			}
 			
@@ -178,6 +179,7 @@ public class GameScreen implements Screen {
 			public void beginContact(Contact contact) {
 				if(PhysicsHelper.wasHit(contact)) {
 					landscape.deform(ball.getPosition(), 50);
+					destroyBall = true;
 					// FIXME destroy ball
 				}
 				
@@ -235,6 +237,12 @@ public class GameScreen implements Screen {
 			renderer.rect(slice.x,slice.y,slice.width,slice.height);//names were changed for clarity, slice.y is always 0
 		}
 		renderer.end();
+		
+		if(destroyBall){
+			world.destroyBody(ball);
+			ballExists = false;
+			destroyBall = false;
+		}
 		
 		if(ballExists){
 			
@@ -349,7 +357,7 @@ public class GameScreen implements Screen {
 			ballExists = false;
 		}
 		
-		makeBall(MyGdxGame.players[MyGdxGame.activePlayer].getCoordinates().x+catapultWidthPx*catapultSize/2,MyGdxGame.players[MyGdxGame.activePlayer].getCoordinates().y+catapultHeightPx*catapultSize);
+		makeBall(MyGdxGame.players[MyGdxGame.activePlayer].getCoordinates().x+catapultWidthPx*catapultSize/2,MyGdxGame.players[MyGdxGame.activePlayer].getCoordinates().y+catapultHeightPx*catapultSize+2*ballSize);
 		
 		if(MyGdxGame.activePlayer==0){
 //			ball.applyForce(force,ball.getWorldCenter());
@@ -371,7 +379,7 @@ public class GameScreen implements Screen {
 		bd.type = BodyType.DynamicBody;
 		ball = world.createBody(bd);
 		CircleShape ballShape = new CircleShape();
-		ballShape.setRadius(5);
+		ballShape.setRadius(ballSize);
 		fd.shape = ballShape;
 		fd.friction = 1.0f;
 		fd.restitution = 0.0f;
