@@ -123,8 +123,7 @@ public class GameScreen implements Screen {
 //		p2Region = new TextureRegion(p1Region);
 
 		//below: Vector holds x and y components of gravity
-		world = new World(new Vector2(0, -50), false); // FIXME what does this
-														// mean
+		world = new World(new Vector2(0, -10), false); // FIXME what does this mean
 
 		landscape = LandscapeFactory.makeLandscape(new SimonsStupidGenerator());
 
@@ -138,7 +137,7 @@ public class GameScreen implements Screen {
 		// A floor below the ground made for testing,
 		// stops elements from falling through ground when all ground is destroyed
 		EdgeShape floor = new EdgeShape();
-		floor.set(new Vector2(0,0), new Vector2(MyGdxGame.wR,0));
+		floor.set(new Vector2(0,0), new Vector2(MyGdxGame.w,0));
 		landBody.createFixture(floor,1f);
 		floor.dispose();
 		
@@ -146,7 +145,7 @@ public class GameScreen implements Screen {
 		landVertices = new Vector2[landscape.getSlices().size()];		
 		int it = 0;
 		for (Rectangle slice : landscape.getSlices()){
-			landVertices[it] = new Vector2(slice.x,slice.height);
+			landVertices[it] = new Vector2(slice.x*MyGdxGame.b2dScale,slice.height*MyGdxGame.b2dScale);
 			it++;
 		};
 		landShape.createChain(landVertices);		
@@ -179,23 +178,33 @@ public class GameScreen implements Screen {
 			@Override
 			public void beginContact(Contact contact) {
 				if(PhysicsHelper.landHit(contact)) {
-					landscape.deform(ball.getPosition(), 50);
+					//I should change deform instead, but is lazy
+					Vector3 defVec = new Vector3();
+					defVec.x = ball.getPosition().x;
+					defVec.y = ball.getPosition().y;
+					defVec.z = 0;
+					camera.project(defVec);
+					Vector2 defVec2 = new Vector2();
+					defVec2.x = defVec.x;
+					defVec2.y = defVec.y;
+					
+					landscape.deform(defVec2, 50);
 					destroyBall = true;
 				}
 				
-				if(PhysicsHelper.tankHit(contact)) {
+//				if(PhysicsHelper.tankHit(contact)) {
 					// someone's hit
-				}
+//				}
 				
 			}
 		});
 		
 		
-		//Making the physical part of the catapults
-		
+		//Making the physical part of the catapults		
 		//FIXME move to catapult factory -----------------
-		catPos1 = new Vector2(MyGdxGame.wR/8, MyGdxGame.hR);
-		catPos2 = new Vector2(MyGdxGame.wR*7/8, MyGdxGame.hR);
+		catPos1 = new Vector2(MyGdxGame.w/8, MyGdxGame.h);
+		catPos2 = new Vector2(MyGdxGame.w*7/8, MyGdxGame.h);
+
 		bd.type = BodyType.DynamicBody;
 		bd.position.x = catPos1.x;
 		bd.position.y =	catPos1.y;
@@ -207,9 +216,9 @@ public class GameScreen implements Screen {
 		PolygonShape cataShape = new PolygonShape();
 		FixtureDef fd = new FixtureDef(); //this fixturedef is reused for the projectile "ball"
 		fd.friction = 10.0f;
-		fd.restitution = 0.2f;
+		fd.restitution = 0.0f;
 		fd.density = 1.0f;
-		float[] catBodArray = {0,0,catapultWidthPx*catapultSize,0,catapultWidthPx*catapultSize,catapultHeightPx*catapultSize,0,catapultHeightPx*catapultSize};
+		float[] catBodArray = {0,0,catapultWidthPx*catapultSize*MyGdxGame.b2dScale,0,catapultWidthPx*catapultSize*MyGdxGame.b2dScale,catapultHeightPx*catapultSize*MyGdxGame.b2dScale,0,catapultHeightPx*catapultSize*MyGdxGame.b2dScale};
 		cataShape.set(catBodArray);
 		fd.shape = cataShape;
 		catapult1.createFixture(fd);
@@ -254,7 +263,7 @@ public class GameScreen implements Screen {
 			
 			renderer.begin(ShapeType.FilledCircle);
 			renderer.setColor(Color.BLUE);
-			renderer.filledCircle(ball.getPosition().x, ball.getPosition().y, 5f, 25);
+			renderer.filledCircle(ball.getPosition().x/MyGdxGame.b2dScale, ball.getPosition().y/MyGdxGame.b2dScale, ballSize, 25);
 			renderer.end();
 		}else{
 			renderer.begin(ShapeType.FilledCircle);
@@ -285,10 +294,10 @@ public class GameScreen implements Screen {
 		batch.begin();
 //		batch.setColor(Color.CLEAR);
 		batch.setColor(Color.BLACK);
-		batch.draw(currentCata1Frame,catapult1.getPosition().x, catapult1.getPosition().y, 0, 0, catapultWidthPx, catapultHeightPx, catapultSize, catapultSize, (int)(catapult1.getAngle()*57.29578));
+		batch.draw(currentCata1Frame,catapult1.getPosition().x/MyGdxGame.b2dScale, catapult1.getPosition().y/MyGdxGame.b2dScale, 0, 0, catapultWidthPx, catapultHeightPx, catapultSize, catapultSize, (int)(catapult1.getAngle()*57.29578));
 //		batch.setColor(Color.CLEAR);
 		batch.setColor(Color.RED);
-		batch.draw(currentCata2Frame,catapult2.getPosition().x, catapult2.getPosition().y, 0, 0, catapultWidthPx, catapultHeightPx, catapultSize, catapultSize, (int)(catapult2.getAngle()*57.29578));
+		batch.draw(currentCata2Frame,catapult2.getPosition().x/MyGdxGame.b2dScale, catapult2.getPosition().y/MyGdxGame.b2dScale, 0, 0, catapultWidthPx, catapultHeightPx, catapultSize, catapultSize, (int)(catapult2.getAngle()*57.29578));
 		batch.end();
 
 		//FIXME wifikundace
@@ -296,24 +305,24 @@ public class GameScreen implements Screen {
 		if(Gdx.input.justTouched()/*isTouched()*/){
 			
 			Vector3 touchPos = new Vector3();
-			touchPos.set(Gdx.input.getX(), MyGdxGame.hR-Gdx.input.getY(), 0);
-//			camera.unproject(touchPos);
+			touchPos.set(Gdx.input.getX(), /*MyGdxGame.h-*/Gdx.input.getY(), 0);
+			camera.unproject(touchPos);
 			
-			if(touchPos.y > MyGdxGame.hR*7/8 && (touchPos.x < MyGdxGame.wR/8 || touchPos.x > MyGdxGame.wR*7/8)){
-				if(touchPos.x < MyGdxGame.wR/8){
+			if(touchPos.y > MyGdxGame.h*7/8 && (touchPos.x < MyGdxGame.w/8 || touchPos.x > MyGdxGame.w*7/8)){
+				if(touchPos.x < MyGdxGame.w/8){
 					game.setScreen(MyGdxGame.mainMenuScreen);
 				}
-				if(touchPos.x > MyGdxGame.wR*7/8){
+				if(touchPos.x > MyGdxGame.w*7/8){
 					animationTimer = 0;
-					MyGdxGame.players[0].setCoordinates(catapult1.getPosition());
-					MyGdxGame.players[1].setCoordinates(catapult2.getPosition());
+//					MyGdxGame.players[0].setCoordinates(catapult1.getPosition());
+//					MyGdxGame.players[1].setCoordinates(catapult2.getPosition());
 					ballBeingFired = true;
 //					fireBall();
 				}
 			}else{
 				System.out.println(""+touchPos.x+", "+touchPos.y);
-				MyGdxGame.players[0].setCoordinates(catapult1.getPosition());
-				MyGdxGame.players[1].setCoordinates(catapult2.getPosition());
+//				MyGdxGame.players[0].setCoordinates(catapult1.getPosition());
+//				MyGdxGame.players[1].setCoordinates(catapult2.getPosition());
 				setTarget(touchPos.x, touchPos.y);
 			}
 			
@@ -349,27 +358,26 @@ public class GameScreen implements Screen {
 			world.destroyBody(ball);
 			ballExists = false;
 		}
-		this.target.x = posX;
-		this.target.y = posY;
+		this.target.x = posX/MyGdxGame.b2dScale;
+		this.target.y = posY/MyGdxGame.b2dScale;
 		setForce();
 	}
 	private void setForce(){
-		this.force.x = Math.abs(target.x-MyGdxGame.players[MyGdxGame.activePlayer].getCoordinates().x)*1000;
-		this.force.y = Math.abs(target.y-MyGdxGame.players[MyGdxGame.activePlayer].getCoordinates().y)*1000;
+		this.force.x = Math.abs(target.x-MyGdxGame.players[MyGdxGame.activePlayer].getCoordinates().x)*MyGdxGame.b2dScale;
+		this.force.y = Math.abs(target.y-MyGdxGame.players[MyGdxGame.activePlayer].getCoordinates().y)*MyGdxGame.b2dScale;
 	}
 	private void fireBall(){
 		if(ballExists){
 			world.destroyBody(ball);
 			ballExists = false;
 		}
-		
-		makeBall(MyGdxGame.players[MyGdxGame.activePlayer].getCoordinates().x+catapultWidthPx*catapultSize/2,MyGdxGame.players[MyGdxGame.activePlayer].getCoordinates().y+catapultHeightPx*catapultSize+2*ballSize);
-		
 		if(MyGdxGame.activePlayer==0){
+			makeBall((catapult1.getPosition().x+catapult1.getLocalCenter().x), (catapult1.getPosition().y+catapult1.getLocalCenter().y*2));
 //			ball.applyForce(force,ball.getWorldCenter());
 			ball.applyLinearImpulse(force,ball.getWorldCenter());
 			MyGdxGame.activePlayer=1;
 		}else{
+			makeBall((catapult2.getPosition().x+catapult2.getLocalCenter().x), (catapult2.getPosition().y+catapult2.getLocalCenter().y*2));
 //			ball.applyForce(-force.x,force.y,ball.getWorldCenter().x,ball.getWorldCenter().y);
 			ball.applyLinearImpulse(-force.x,force.y,ball.getWorldCenter().x,ball.getWorldCenter().y);
 			MyGdxGame.activePlayer=0;
@@ -385,15 +393,18 @@ public class GameScreen implements Screen {
 		bd.type = BodyType.DynamicBody;
 		ball = world.createBody(bd);
 		CircleShape ballShape = new CircleShape();
-		ballShape.setRadius(ballSize);
+		ballShape.setRadius(ballSize*MyGdxGame.b2dScale);
 		fd.shape = ballShape;
 		fd.friction = 1.0f;
 		fd.restitution = 0.0f;
-		fd.density = 1.0f;
+		fd.density = 10.0f;
 		ball.createFixture(fd);
 		ball.setUserData(PhysicsHelper.BALL);
 		ballShape.dispose();
 		ballExists = true;
+		System.out.println("Catapult1 is at: "+catapult1.getPosition().x+", "+catapult1.getPosition().y);
+		System.out.println("Ball made at: "+ball.getPosition().x+", "+ball.getPosition().y);
+		
 	}
 
 	@Override
