@@ -119,7 +119,7 @@ public class GameScreen implements Screen {
 //		p2Region = new TextureRegion(p1Region);
 
 		//below: Vector holds x and y components of gravity
-		world = new World(new Vector2(0, -10), false); // FIXME what does this
+		world = new World(new Vector2(0, -50), false); // FIXME what does this
 														// mean
 
 		landscape = LandscapeFactory.makeLandscape(new SimonsStupidGenerator());
@@ -309,8 +309,8 @@ public class GameScreen implements Screen {
 		setForce();
 	}
 	private void setForce(){
-		this.force.x = Math.abs(target.x-MyGdxGame.players[MyGdxGame.activePlayer].getCoordinates().x)*100;
-		this.force.y = Math.abs(target.y-MyGdxGame.players[MyGdxGame.activePlayer].getCoordinates().y)*100;
+		this.force.x = Math.abs(target.x-MyGdxGame.players[MyGdxGame.activePlayer].getCoordinates().x)*1000;
+		this.force.y = Math.abs(target.y-MyGdxGame.players[MyGdxGame.activePlayer].getCoordinates().y)*1000;
 	}
 	private void fireBall(){
 		if(ballExists){
@@ -321,10 +321,12 @@ public class GameScreen implements Screen {
 		makeBall(MyGdxGame.players[MyGdxGame.activePlayer].getCoordinates().x+catapultWidthPx*catapultSize/2,MyGdxGame.players[MyGdxGame.activePlayer].getCoordinates().y+catapultHeightPx*catapultSize);
 		
 		if(MyGdxGame.activePlayer==0){
-			ball.applyForce(force,ball.getWorldCenter());
+//			ball.applyForce(force,ball.getWorldCenter());
+			ball.applyLinearImpulse(force,ball.getWorldCenter());
 			MyGdxGame.activePlayer=1;
 		}else{
-			ball.applyForce(-force.x,force.y,ball.getWorldCenter().x,ball.getWorldCenter().y);
+//			ball.applyForce(-force.x,force.y,ball.getWorldCenter().x,ball.getWorldCenter().y);
+			ball.applyLinearImpulse(-force.x,force.y,ball.getWorldCenter().x,ball.getWorldCenter().y);
 			MyGdxGame.activePlayer=0;
 		}
 		
@@ -342,7 +344,7 @@ public class GameScreen implements Screen {
 		fd.shape = ballShape;
 		fd.friction = 1.0f;
 		fd.restitution = 0.0f;
-		fd.density = 0.1f;
+		fd.density = 1.0f;
 		ball.createFixture(fd);
 		ballShape.dispose();
 		ballExists = true;
