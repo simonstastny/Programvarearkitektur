@@ -1,11 +1,9 @@
 package no.ntnu.swa.a13.screens;
 
-import java.util.Vector;
-
 import no.ntnu.swa.a13.MyGdxGame;
+import no.ntnu.swa.a13.PhysicsHelper;
 import no.ntnu.swa.a13.landscape.Landscape;
 import no.ntnu.swa.a13.landscape.LandscapeFactory;
-import no.ntnu.swa.a13.landscape.LandscapeGenerator;
 import no.ntnu.swa.a13.landscape.SimonsStupidGenerator;
 
 import com.badlogic.gdx.Gdx;
@@ -16,7 +14,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -26,11 +23,16 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.ChainShape;
-import com.badlogic.gdx.physics.box2d.EdgeShape;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.ChainShape;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.EdgeShape;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
@@ -150,7 +152,38 @@ public class GameScreen implements Screen {
 		landShape.dispose();
 		
 		
-		
+		world.setContactListener(new ContactListener() {
+			
+			@Override
+			public void preSolve(Contact contact, Manifold oldManifold) {
+				if(PhysicsHelper.wasHit(contact)) {
+					landscape.deform(ball.getPosition(), 50);
+					ballExists = false;
+				}
+				
+			}
+			
+			@Override
+			public void postSolve(Contact contact, ContactImpulse impulse) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void endContact(Contact contact) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void beginContact(Contact contact) {
+				if(PhysicsHelper.wasHit(contact)) {
+					landscape.deform(ball.getPosition(), 50);
+					// FIXME destroy ball
+				}
+				
+			}
+		});
 		
 		
 		//Making the physical part of the catapults
@@ -191,7 +224,6 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-		
 		Gdx.gl.glClearColor(1f, 1f, 1f, 0f);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
@@ -346,6 +378,7 @@ public class GameScreen implements Screen {
 		fd.restitution = 0.0f;
 		fd.density = 1.0f;
 		ball.createFixture(fd);
+		ball.setUserData(PhysicsHelper.BALL_ID);
 		ballShape.dispose();
 		ballExists = true;
 	}
