@@ -36,7 +36,7 @@ public class GameLogic implements Runnable, GameEventListener {
 		this.deadPlayers = new Vector<Player>(numPlayers);
 
 		for (int i = 0; i < numPlayers; i++) {
-			activePlayers.add(new Player(i, null)); // FIXME coordinates generation
+			activePlayers.add(new Player(i, strategy.generateCoords(i, numPlayers)));
 		}
 	}
 
