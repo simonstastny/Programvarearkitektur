@@ -18,9 +18,13 @@ public class GameLogic implements Runnable, GameEventListener {
 
 	private GameStatus status;
 
+	RingIterator<Player> playerIter;
+	
 	// fields
 	Vector<Player> activePlayers;
 	Vector<Player> deadPlayers;
+	
+	Player onTurn;
 
 	Score score;
 
@@ -86,5 +90,21 @@ public class GameLogic implements Runnable, GameEventListener {
 
 	public void setStatus(GameStatus status) {
 		this.status = status;
+	}
+	
+	public Player nextPlayer() {
+		if(playerIter == null) {
+			playerIter = new RingIterator<Player>(activePlayers);
+		}
+		
+		return playerIter.next();
+	}
+	
+	public Player getPlayer() {
+		if(playerIter == null) {
+			playerIter = new RingIterator<Player>(activePlayers);
+		}
+		
+		return playerIter.get();
 	}
 }
