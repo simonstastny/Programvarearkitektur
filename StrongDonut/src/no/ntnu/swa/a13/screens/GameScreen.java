@@ -2,6 +2,7 @@ package no.ntnu.swa.a13.screens;
 
 import no.ntnu.swa.a13.MyGdxGame;
 import no.ntnu.swa.a13.PhysicsHelper;
+import no.ntnu.swa.a13.Player;
 import no.ntnu.swa.a13.landscape.Landscape;
 import no.ntnu.swa.a13.landscape.LandscapeFactory;
 import no.ntnu.swa.a13.landscape.SimonsStupidGenerator;
@@ -177,10 +178,13 @@ public class GameScreen implements Screen {
 			
 			@Override
 			public void beginContact(Contact contact) {
-				if(PhysicsHelper.wasHit(contact)) {
+				if(PhysicsHelper.landHit(contact)) {
 					landscape.deform(ball.getPosition(), 50);
 					destroyBall = true;
-					// FIXME destroy ball
+				}
+				
+				if(PhysicsHelper.tankHit(contact)) {
+					// someone's hit
 				}
 				
 			}
@@ -188,6 +192,8 @@ public class GameScreen implements Screen {
 		
 		
 		//Making the physical part of the catapults
+		
+		//FIXME move to catapult factory -----------------
 		catPos1 = new Vector2(MyGdxGame.wR/8, MyGdxGame.hR);
 		catPos2 = new Vector2(MyGdxGame.wR*7/8, MyGdxGame.hR);
 		bd.type = BodyType.DynamicBody;
@@ -209,7 +215,7 @@ public class GameScreen implements Screen {
 		catapult1.createFixture(fd);
 		catapult2.createFixture(fd);
 		cataShape.dispose();
-		
+		//FIXME ------------------------------------------
 		
 		//The ball used for testing will be the new projectile instead
 		//makeBall(MyGdxGame.wR/2,MyGdxGame.hR);
@@ -385,7 +391,7 @@ public class GameScreen implements Screen {
 		fd.restitution = 0.0f;
 		fd.density = 1.0f;
 		ball.createFixture(fd);
-		ball.setUserData(PhysicsHelper.BALL_ID);
+		ball.setUserData(PhysicsHelper.BALL);
 		ballShape.dispose();
 		ballExists = true;
 	}
@@ -426,6 +432,15 @@ public class GameScreen implements Screen {
 		renderer.dispose();
 		// TODO Auto-generated method stub
 
+	}
+	
+	class CatapultFactory {
+		
+		void createCatapult(Player player) {
+			
+		}
+		
+		
 	}
 
 }
