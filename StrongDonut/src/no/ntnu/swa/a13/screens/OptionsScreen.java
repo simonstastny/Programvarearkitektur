@@ -62,7 +62,7 @@ public class OptionsScreen implements Screen {// A the game class, it will hold 
 		
 		batch.end();
 		
-		if(Gdx.input.isTouched()){
+		if(Gdx.input.justTouched()){
 			Vector3 touchPos = new Vector3();
 			touchPos.set(Gdx.input.getX(),Gdx.input.getY(), 0);
 //			camera.unproject(touchPos);

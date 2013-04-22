@@ -73,4 +73,7 @@ public class Player {
 	public void setAngle(float angle) {
 		this.angle = angle;
 	}
+	public void setCoordinates(Vector2 coordinates){
+		this.coordinates = coordinates;
+	}
 }

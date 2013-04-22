@@ -62,7 +62,7 @@ public class MainMenuScreen implements Screen {
 		
 		batch.end();
 		
-		if(Gdx.input.isTouched()){
+		if(Gdx.input.justTouched()){
 			Vector3 touchPos = new Vector3();
 			touchPos.set(Gdx.input.getX(),Gdx.input.getY(), 0);
 //			camera.unproject(touchPos);

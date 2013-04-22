@@ -5,6 +5,7 @@ import no.ntnu.swa.a13.screens.*;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 //import com.badlogic.gdx.Gdx;
 //import com.badlogic.gdx.graphics.GL10;
 //import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -39,6 +40,11 @@ public class MyGdxGame extends Game {
 	public static float h;
 	
 	
+//A game needs players!
+	public static Player[] players;
+//Late development turn monitoring variable
+	public static int activePlayer = 0;
+	
 	
 //Because it is easier to make and move code than the other way around
 //it might look a bit nasty here for a while - Sindre
@@ -57,6 +63,11 @@ public class MyGdxGame extends Game {
 		//This matrix is needed to render smaller objects without losing details
 		scalingMatrix = new Matrix4();
 		scalingMatrix.setToScaling(b2dScale, b2dScale, 1);
+		
+		//Making players
+		players = new Player[2];
+		players[0] = new Player(1, new Vector2(0,0));
+		players[1] = new Player(2, new Vector2(0,0));
 		
 		
 	//Screens made after the other parts of the game have been created, this is important
