@@ -12,6 +12,8 @@ import no.ntnu.swa.a13.PhysicsHelper;
 import no.ntnu.swa.a13.Player;
 import no.ntnu.swa.a13.landscape.Landscape;
 import no.ntnu.swa.a13.landscape.LandscapeFactory;
+import no.ntnu.swa.a13.landscape.NetherlandsGenerator;
+import no.ntnu.swa.a13.landscape.PolandGenerator;
 import no.ntnu.swa.a13.landscape.SimonsStupidGenerator;
 
 import com.badlogic.gdx.Gdx;
@@ -147,7 +149,7 @@ public class GameScreen implements Screen {
 		//below: Vector holds x and y components of gravity
 		world = new World(new Vector2(0, -10), false); // FIXME what does this mean
 
-		landscape = LandscapeFactory.makeLandscape(new SimonsStupidGenerator());
+		landscape = LandscapeFactory.makeLandscape(new NetherlandsGenerator());
 
 		landBody = bodyFactory.makeLandmass();
 		
@@ -468,7 +470,7 @@ public class GameScreen implements Screen {
 	}
 	
 	void gameOver() {
-		//FIXME
+		game.setScreen(MyGdxGame.gameOverScreen);
 	}
 	
 	//We already have a list of players

@@ -26,6 +26,7 @@ public class MyGdxGame extends Game {
 	public static MainMenuScreen mainMenuScreen;
 	public static OptionsScreen optionsScreen;
 	public static GameScreen gameScreen;
+	public static GameOverScreen gameOverScreen;
 	
 //The lovely "global" variables will be made here, and created in create()
 	//Scaling factor for box2d to make physics more plausible
@@ -77,6 +78,7 @@ public class MyGdxGame extends Game {
 		mainMenuScreen = new MainMenuScreen(this);
 		optionsScreen = new OptionsScreen(this);
 		gameScreen = new GameScreen(this);
+		gameOverScreen = new GameOverScreen(this);
 		
 	//The following call sets the initial screen, and it will start rendering
 	//this is the last thing to happen in create()
