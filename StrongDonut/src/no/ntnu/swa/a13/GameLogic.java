@@ -3,7 +3,7 @@ package no.ntnu.swa.a13;
 import java.util.Iterator;
 import java.util.Vector;
 
-import no.ntnu.swa.a13.Player.PlayerStatus;
+import no.ntnu.swa.a13.Player.Status;
 import no.ntnu.swa.a13.util.RingIterator;
 
 //note from Sindre - this class will be dumbed down/ commented out
@@ -61,7 +61,7 @@ public class GameLogic implements Runnable, GameEventListener {
 
 			target.causeDamage(damageEvent.getDamage());
 
-			if (target.getStatus() == PlayerStatus.DESTROYED) {
+			if (target.getStatus() == Status.DESTROYED) {
 				activePlayers.remove(target);
 				deadPlayers.add(target);
 			}

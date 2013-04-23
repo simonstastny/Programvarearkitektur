@@ -91,6 +91,7 @@ public class GameScreen implements Screen {
 	private Vector2 target, force;
 	private boolean ballExists = false;
 	private boolean destroyBall = false;
+	private boolean destroyPlayer = false;
 	private boolean ballBeingFired = false;
 	private boolean ignoreHit = true;
 	private boolean updateLandscape = false;
@@ -207,7 +208,25 @@ public class GameScreen implements Screen {
 				//solving problems with boolean variables is so pretty
 				//the following function boolean checks are there to prevent catapults from self-destructing
 				if(!ignoreHit){
-					if(PhysicsHelper.landHit(contact)) {
+					
+					if(PhysicsHelper.tankHit(contact)) {
+						// someone's hit
+						
+						System.out.println("TANK HIT ---------------");
+						
+						Fixture tank = PhysicsHelper.getTank(contact.getFixtureA(), contact.getFixtureB());
+						
+						if(tank.getBody().equals(catapult1)) {
+							Player.Status stat = MyGdxGame.players[0].causeDamage(100); //FIXME full force by default
+							
+							if(stat == Player.Status.DESTROYED) {
+								destroyPlayer = true;
+							}
+						}
+						
+						destroyBall = true;
+						
+					} else if(PhysicsHelper.landHit(contact)) {
 						//I should change deform input parameters instead, but this is faster
 						Vector3 defVec = new Vector3();
 						defVec.x = ball.getPosition().x;
@@ -222,11 +241,8 @@ public class GameScreen implements Screen {
 						
 						updateLandscape = true;
 						destroyBall = true;
-					}
-
-//					if(PhysicsHelper.tankHit(contact)) {
-						// someone's hit
-//					}
+					}				
+					
 					ignoreHit = true;
 				}else{
 					ignoreHit = false;
@@ -551,7 +567,7 @@ public class GameScreen implements Screen {
 			catapult.createFixture(fd);
 			cataShape.dispose();
 			
-			
+			catapult.setUserData(PhysicsHelper.CATAPULT);
 //			catapult.setUserData(player); //With recent changes this would make a catapult hold a reference to a player with a reference to a catapult etc.
 			
 			return catapult;

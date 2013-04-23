@@ -4,9 +4,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
 public class Player {
-	private PlayerStatus status;
+	private Status status;
 
-	public enum PlayerStatus {
+	public enum Status {
 		DESTROYED, ALIVE;
 	}
 
@@ -37,7 +37,7 @@ public class Player {
 		this.force = GameLogic.HEALTH_MAX;
 		this.angle = GameLogic.HEALTH_MAX;
 
-		this.status = PlayerStatus.ALIVE;
+		this.status = Status.ALIVE;
 	}
 
 	/**
@@ -45,15 +45,21 @@ public class Player {
 	 * @param damage
 	 *            point to subtract from health
 	 */
-	void causeDamage(float damage) {
+	public Status causeDamage(float damage) {
 		health = health - damage;
+		
+		System.out.println("TANK ID " + id + " has health " + health);
 
 		if (health <= 0) {
-			status = PlayerStatus.DESTROYED;
+			status = Status.DESTROYED;
+			System.out.println("DESTROYED " + id);
+			return Status.DESTROYED;
 		}
+		
+		return Status.ALIVE;
 	}
 
-	public PlayerStatus getStatus() {
+	public Status getStatus() {
 		return status;
 	}
 
