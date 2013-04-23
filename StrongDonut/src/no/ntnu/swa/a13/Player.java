@@ -1,6 +1,7 @@
 package no.ntnu.swa.a13;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 
 public class Player {
 	private PlayerStatus status;
@@ -15,6 +16,8 @@ public class Player {
 
 	private float force;
 	private float angle;
+	
+	private Body catapult;
 
 	private float health;
 
@@ -56,6 +59,14 @@ public class Player {
 
 	public Vector2 getCoordinates() {
 		return coordinates;
+	}
+	
+	public void setCatapultBody(Body catapult){
+		this.catapult = catapult;
+	}
+	
+	public Body getCatapult(){
+		return catapult;
 	}
 
 	public float getForce() {

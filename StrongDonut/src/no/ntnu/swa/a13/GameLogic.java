@@ -6,10 +6,19 @@ import java.util.Vector;
 import no.ntnu.swa.a13.Player.PlayerStatus;
 import no.ntnu.swa.a13.util.RingIterator;
 
+//note from Sindre - this class will be dumbed down/ commented out
+//to make it easier to implement the current two-player game
+//the work needed to enable more than two players does not seem
+//to be within our current timeframe
+//*then commeth a period of time in which i try to make use of this*
+//and then: after further consideration, this is way to complex for the simple game we are making right now
+//it holds mostly information going far above and beyond what we need to make a working game
+//if we had the time and manpower this would be vital, but the way to go now is something simple that works
+
 public class GameLogic implements Runnable, GameEventListener {
-	// constants
+	// constants - the latter two will never be used in the current game
 	public static final float HEALTH_MAX = 100;
-	public static final float FORCE_DEFAULT = 50;
+	public static final float FORCE_DEFAULT = 50; 
 	public static final float ANGLE_DEFAULT = 45;
 
 	enum GameStatus {

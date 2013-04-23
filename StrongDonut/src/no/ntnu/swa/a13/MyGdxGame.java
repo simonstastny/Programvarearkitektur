@@ -39,8 +39,8 @@ public class MyGdxGame extends Game {
 	public static float w;
 	public static float h;
 	
-	
-//A game needs players!
+
+//A game needs players! -
 	public static Player[] players;
 //Late development turn monitoring variable
 	public static int activePlayer = 0;
@@ -63,6 +63,7 @@ public class MyGdxGame extends Game {
 		//This matrix is needed to render smaller objects without losing details
 		scalingMatrix = new Matrix4();
 		scalingMatrix.setToScaling(b2dScale, b2dScale, 1);
+		
 		
 		//Making players
 		players = new Player[2];

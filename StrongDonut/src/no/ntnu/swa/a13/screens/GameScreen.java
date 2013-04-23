@@ -3,6 +3,8 @@ package no.ntnu.swa.a13.screens;
 import java.util.ArrayList;
 import java.util.List;
 
+import sun.font.CreatedFontTracker;
+
 import no.ntnu.swa.a13.FreeForAllStrategy;
 import no.ntnu.swa.a13.GameLogic;
 import no.ntnu.swa.a13.MyGdxGame;
@@ -44,7 +46,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public class GameScreen implements Screen {
 	
-	private GameLogic gameLogic= new  GameLogic(2, new FreeForAllStrategy());
+//	private GameLogic gameLogic= new  GameLogic(2, new FreeForAllStrategy());
 	
 	public static final int WIDTH = Gdx.graphics.getWidth();
 	public static final int HEIGHT = Gdx.graphics.getHeight();
@@ -90,10 +92,13 @@ public class GameScreen implements Screen {
 	private boolean ballExists = false;
 	private boolean destroyBall = false;
 	private boolean ballBeingFired = false;
+	private boolean ignoreHit = true;
+	private boolean updateLandscape = false;
 	
 	// game bodies
 	private Body ball, landBody, catapult1, catapult2;
-	private List<Body> playerBodies;
+	private Vector2 catPos1, catPos2;
+//	private List<Body> playerBodies;
 
 	
 	/** ------------------------- */
@@ -150,12 +155,16 @@ public class GameScreen implements Screen {
 		bd.position.x = 0;
 		bd.type = BodyType.StaticBody;
 		landBody = world.createBody(bd);
+		FixtureDef fd = new FixtureDef();
+		fd.restitution = 0.0f;
+		fd.friction = 10.0f;
 		
 		// A floor below the ground made for testing,
 		// stops elements from falling through ground when all ground is destroyed
 		EdgeShape floor = new EdgeShape();
+		fd.shape = floor;
 		floor.set(new Vector2(0,0), new Vector2(MyGdxGame.w,0));
-		landBody.createFixture(floor,1f);
+		landBody.createFixture(fd);
 		floor.dispose();
 		
 		ChainShape landShape = new ChainShape();
@@ -165,8 +174,9 @@ public class GameScreen implements Screen {
 			landVertices[it] = new Vector2(slice.x*MyGdxGame.b2dScale,slice.height*MyGdxGame.b2dScale);
 			it++;
 		};
-		landShape.createChain(landVertices);		
-		landBody.createFixture(landShape , 1f); //static body density does not matter
+		landShape.createChain(landVertices);
+		fd.shape = landShape;
+		landBody.createFixture(fd); //static body density does not matter
 		landShape.dispose();
 		
 		
@@ -188,46 +198,66 @@ public class GameScreen implements Screen {
 			
 			@Override
 			public void endContact(Contact contact) {
-				// TODO Auto-generated method stub
+
 				
 			}
 			
 			@Override
 			public void beginContact(Contact contact) {
-				if(PhysicsHelper.landHit(contact)) {
-					//I should change deform instead, but is lazy
-					Vector3 defVec = new Vector3();
-					defVec.x = ball.getPosition().x;
-					defVec.y = ball.getPosition().y;
-					defVec.z = 0;
-					camera.project(defVec);
-					Vector2 defVec2 = new Vector2();
-					defVec2.x = defVec.x;
-					defVec2.y = defVec.y;
-					
-					landscape.deform(defVec2, 50);
-					destroyBall = true;
+				//solving problems with boolean variables is so pretty
+				//the following function boolean checks are there to prevent catapults from self-destructing
+				if(!ignoreHit){
+					if(PhysicsHelper.landHit(contact)) {
+						//I should change deform input parameters instead, but this is faster
+						Vector3 defVec = new Vector3();
+						defVec.x = ball.getPosition().x;
+						defVec.y = ball.getPosition().y;
+						defVec.z = 0;
+						camera.project(defVec);
+						Vector2 defVec2 = new Vector2();
+						defVec2.x = defVec.x;
+						defVec2.y = defVec.y;
+						
+						landscape.deform(defVec2, 50);
+						
+						updateLandscape = true;
+						destroyBall = true;
+					}
+
+//					if(PhysicsHelper.tankHit(contact)) {
+						// someone's hit
+//					}
+					ignoreHit = true;
+				}else{
+					ignoreHit = false;
 				}
 				
-//				if(PhysicsHelper.tankHit(contact)) {
-					// someone's hit
-//				}
+
 				
 			}
 		});
 		
 		// initialize players, create catapults
 		
-		initializePlayers();
+//		initializePlayers();
+		//Since we like the falling catapults, i'll save some work and keep them
+		//if we want them making a less weird entrance all we need to do is fetch
+		//the height of the slices underneath and set it to the 2nd parameter in the
+		//following vectors
+		catPos1 = new Vector2(MyGdxGame.w/8, MyGdxGame.h*7/8);
+		catPos2 = new Vector2(MyGdxGame.w*7/8, MyGdxGame.h*7/8);
 		
-		catapult1 = playerBodies.get(0); //FIXME not tidy enough
-		catapult2 = playerBodies.get(1); //FIXME not tidy enough
+		catapult1 = bodyFactory.makeCatapult(catPos1); 
+		MyGdxGame.players[0].setCatapultBody(catapult1);
+		catapult2 = bodyFactory.makeCatapult(catPos2); 
+		MyGdxGame.players[1].setCatapultBody(catapult2);
 		
 		//The ball used for testing will be the new projectile instead
 		//makeBall(MyGdxGame.wR/2,MyGdxGame.hR);
 		
-		target = new Vector2(0,0); //FIXME WTF
-		force = new Vector2(0,0);
+		force = new Vector2();
+		target = new Vector2(); //FIXME WTF - Haha, this was just an easy place to put it, nothing more. Centre of screen should be better. SN.
+		setTarget(MyGdxGame.w/2, MyGdxGame.h/2);
 	}
 	
 
@@ -247,18 +277,38 @@ public class GameScreen implements Screen {
 		}
 		renderer.end();
 		
+		
 		if(destroyBall){
-			world.destroyBody(ball);
-			ballExists = false;
+			setTarget(MyGdxGame.w/2, MyGdxGame.h/2);
+//			world.destroyBody(ball);
+//			ballExists = false;
 			destroyBall = false;
 		}
 		
+		if(updateLandscape){
+			ChainShape landShape = new ChainShape();
+			int it = 0;
+			for (Rectangle slice : landscape.getSlices()){
+				landVertices[it] = new Vector2(slice.x*MyGdxGame.b2dScale,slice.height*MyGdxGame.b2dScale);
+				it++;
+			};
+			landShape.createChain(landVertices);		
+			landBody.createFixture(landShape , 1f); //static body density does not matter
+			landShape.dispose();
+			landBody.destroyFixture(landBody.getFixtureList().get(1)); //the fixture at 0 is the floor
+			updateLandscape = false;
+		}
+		
 		if(ballExists){
-			
 			renderer.begin(ShapeType.FilledCircle);
 			renderer.setColor(Color.BLUE);
 			renderer.filledCircle(ball.getPosition().x/MyGdxGame.b2dScale, ball.getPosition().y/MyGdxGame.b2dScale, ballSize, 25);
 			renderer.end();
+			
+			if(ball.getPosition().x < 0 || ball.getPosition().x > MyGdxGame.w){
+				setTarget(MyGdxGame.w/2, MyGdxGame.h/2);
+			}
+			
 		}else{
 			renderer.begin(ShapeType.FilledCircle);
 			if(MyGdxGame.activePlayer==1){
@@ -278,6 +328,7 @@ public class GameScreen implements Screen {
 			}else{
 				currentCata2Frame = catapult2Ani.getKeyFrame(animationTimer+=delta,true);
 			}
+			//experiment			
 			if(animationTimer > 18*animationDelta){
 				ballBeingFired = false;
 				fireBall();
@@ -314,7 +365,7 @@ public class GameScreen implements Screen {
 //					fireBall();
 				}
 			}else{
-				System.out.println(""+touchPos.x+", "+touchPos.y);
+				System.out.println(""+touchPos.x+", "+touchPos.y);//TODO remove this
 //				MyGdxGame.players[0].setCoordinates(catapult1.getPosition());
 //				MyGdxGame.players[1].setCoordinates(catapult2.getPosition());
 				setTarget(touchPos.x, touchPos.y);
@@ -347,6 +398,7 @@ public class GameScreen implements Screen {
 
 	}
 	
+	//setTarget is also used as a standard function to destroy the ball/ projectile
 	private void setTarget(float posX, float posY){
 		if(ballExists){
 			world.destroyBody(ball);
@@ -354,27 +406,30 @@ public class GameScreen implements Screen {
 		}
 		this.target.x = posX/MyGdxGame.b2dScale;
 		this.target.y = posY/MyGdxGame.b2dScale;
-		setForce();
+		setForce(posX,posY);
 	}
-	private void setForce(){
-		this.force.x = Math.abs(target.x-MyGdxGame.players[MyGdxGame.activePlayer].getCoordinates().x)*MyGdxGame.b2dScale;
-		this.force.y = Math.abs(target.y-MyGdxGame.players[MyGdxGame.activePlayer].getCoordinates().y)*MyGdxGame.b2dScale;
+	private void setForce(float posX, float posY){
+		System.out.println("Currently active player: "+MyGdxGame.activePlayer);//TODO remove this
+		System.out.println("Active player Xforce: "+Math.abs(target.x-(MyGdxGame.players[MyGdxGame.activePlayer].getCatapult().getPosition().x)));//TODO remove this
+		this.force.x = Math.abs(posX-(MyGdxGame.players[MyGdxGame.activePlayer].getCatapult().getPosition().x));
+		this.force.y = Math.abs(posY-MyGdxGame.players[MyGdxGame.activePlayer].getCatapult().getPosition().y);
 	}
 	private void fireBall(){
+		ignoreHit = true;
 		if(ballExists){
 			world.destroyBody(ball);
 			ballExists = false;
 		}
 		
-		//Player player = gameLogic.nextPlayer(); //FIXME
+		//Player player = gameLogic.nextPlayer(); //FIXME - another function not going to be used because it adds more complexity than functionality at this point
 		
 		if(MyGdxGame.activePlayer==0){
-			ball = bodyFactory.makeBall(new Vector2((catapult1.getPosition().x+catapult1.getLocalCenter().x), (catapult1.getPosition().y+catapult1.getLocalCenter().y*2)));
+			ball = bodyFactory.makeBall(new Vector2((catapult1.getPosition().x+catapult1.getLocalCenter().x), (catapult1.getPosition().y+catapult1.getLocalCenter().y)));
 //			ball.applyForce(force,ball.getWorldCenter());
 			ball.applyLinearImpulse(force,ball.getWorldCenter());
 			MyGdxGame.activePlayer=1;
 		} else{
-			ball = bodyFactory.makeBall(new Vector2((catapult2.getPosition().x+catapult2.getLocalCenter().x), (catapult2.getPosition().y+catapult2.getLocalCenter().y*2)));
+			ball = bodyFactory.makeBall(new Vector2((catapult2.getPosition().x+catapult2.getLocalCenter().x), (catapult2.getPosition().y+catapult2.getLocalCenter().y)));
 //			ball.applyForce(-force.x,force.y,ball.getWorldCenter().x,ball.getWorldCenter().y);
 			ball.applyLinearImpulse(-force.x,force.y,ball.getWorldCenter().x,ball.getWorldCenter().y);
 			MyGdxGame.activePlayer=0;
@@ -420,13 +475,15 @@ public class GameScreen implements Screen {
 
 	}
 	
-	private void initializePlayers() {	
-		playerBodies = new ArrayList<Body>(gameLogic.getActivePlayers().size());
-		
-		for(Player player : gameLogic.getActivePlayers()) {
-			playerBodies.add(bodyFactory.makeCatapult(player));			
-		}	
-	}
+	//We already have a list of players
+	
+//	private void initializePlayers() {	
+//		playerBodies = new ArrayList<Body>(gameLogic.getActivePlayers().size());
+//		
+//		for(Player player : gameLogic.getActivePlayers()) {
+//			playerBodies.add(bodyFactory.makeCatapult(player));			
+//		}	
+//	}
 	
 	class BodyFactory {
 		
@@ -445,29 +502,39 @@ public class GameScreen implements Screen {
 			fd.friction = 1.0f;
 			fd.restitution = 0.0f;
 			fd.density = 10.0f;
+			fd.isSensor = true;
 			ballBody.createFixture(fd);
 			ballBody.setUserData(PhysicsHelper.BALL);
 			ballShape.dispose();
 			ballExists = true;
-			System.out.println("Catapult1 is at: "+catapult1.getPosition().x+", "+catapult1.getPosition().y);
-			System.out.println("Ball made at: "+ballBody.getPosition().x+", "+ballBody.getPosition().y);
+			System.out.println("Catapult1 is at: "+catapult1.getPosition().x+", "+catapult1.getPosition().y);//TODO remove this
+			System.out.println("Catapult2 is at: "+catapult2.getPosition().x+", "+catapult2.getPosition().y);//TODO remove this
+			System.out.println("Ball made at: "+ballBody.getPosition().x+", "+ballBody.getPosition().y);//TODO remove this
+			System.out.println("Ball force at: "+force.x+", "+force.y);//TODO remove this
 			
 			return ballBody;
 			
 		}
 		
-		public Body makeCatapult(Player player) {
+		public Body makeCatapult(Vector2 catPos/*Player player*/) {
 			Body catapult = null;
 			
 			BodyDef bd = new BodyDef();
 			
-			// set position
-			bd.position.x = player.getCoordinates().x;
-			bd.position.y = player.getCoordinates().y;
+			// set position - playerCoordinates are not used or updated
+			// as the catapult might move it would change the player and make chaos
+			// instead each player has a catapult, and catapults have positions
+			// that way the position is not stored as two different positions
+//			bd.position.x = player.getCoordinates().x;
+//			bd.position.y = player.getCoordinates().y;
+			
+			bd.position.x = catPos.x;
+			bd.position.y = catPos.y;
 
 			bd.type = BodyType.DynamicBody;
 			
 			bd.angularDamping = 15.0f;
+			bd.linearDamping = 3.0f;
 			
 			catapult = world.createBody(bd);
 
@@ -484,7 +551,8 @@ public class GameScreen implements Screen {
 			catapult.createFixture(fd);
 			cataShape.dispose();
 			
-			catapult.setUserData(player);
+			
+//			catapult.setUserData(player); //With recent changes this would make a catapult hold a reference to a player with a reference to a catapult etc.
 			
 			return catapult;
 		}
