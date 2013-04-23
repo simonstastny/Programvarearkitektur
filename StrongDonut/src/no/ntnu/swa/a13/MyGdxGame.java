@@ -1,5 +1,9 @@
 package no.ntnu.swa.a13;
 
+import no.ntnu.swa.a13.landscape.LandscapeGenerator;
+import no.ntnu.swa.a13.landscape.NetherlandsGenerator;
+import no.ntnu.swa.a13.landscape.PolandGenerator;
+import no.ntnu.swa.a13.landscape.SimonsStupidGenerator;
 import no.ntnu.swa.a13.screens.*;
 
 import com.badlogic.gdx.Game;
@@ -20,6 +24,18 @@ public class MyGdxGame extends Game {
 //	private SpriteBatch batch;
 //	private Texture texture;
 //	private Sprite sprite;
+	
+	public static LandscapeGenerator getLandscapeGenerator() {
+		double rand = Math.random();
+		
+		if(rand < 0.1d) {
+			return new NetherlandsGenerator(); 
+		} else if (rand < 0.5d) {
+			return new PolandGenerator(); 
+		} else {
+			return new SimonsStupidGenerator(); 
+		}
+	}
 	
 	
 //The different menus/ screens are made here, and created in create()
@@ -77,7 +93,7 @@ public class MyGdxGame extends Game {
 	//values sounds like a bad idea
 		mainMenuScreen = new MainMenuScreen(this);
 		optionsScreen = new OptionsScreen(this);
-		gameScreen = new GameScreen(this);
+		gameScreen = new GameScreen(this, getLandscapeGenerator());
 		gameOverScreen = new GameOverScreen(this);
 		
 	//The following call sets the initial screen, and it will start rendering

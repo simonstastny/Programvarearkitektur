@@ -12,6 +12,7 @@ import no.ntnu.swa.a13.PhysicsHelper;
 import no.ntnu.swa.a13.Player;
 import no.ntnu.swa.a13.landscape.Landscape;
 import no.ntnu.swa.a13.landscape.LandscapeFactory;
+import no.ntnu.swa.a13.landscape.LandscapeGenerator;
 import no.ntnu.swa.a13.landscape.NetherlandsGenerator;
 import no.ntnu.swa.a13.landscape.PolandGenerator;
 import no.ntnu.swa.a13.landscape.SimonsStupidGenerator;
@@ -104,7 +105,7 @@ public class GameScreen implements Screen {
 
 	
 	/** ------------------------- */
-	public GameScreen(MyGdxGame gameRef) {
+	public GameScreen(MyGdxGame gameRef, LandscapeGenerator generator) {
 		
 		bodyFactory = new BodyFactory();
 		
@@ -149,7 +150,7 @@ public class GameScreen implements Screen {
 		//below: Vector holds x and y components of gravity
 		world = new World(new Vector2(0, -10), false); // FIXME what does this mean
 
-		landscape = LandscapeFactory.makeLandscape(new NetherlandsGenerator());
+		landscape = LandscapeFactory.makeLandscape(generator);
 
 		landBody = bodyFactory.makeLandmass();
 		

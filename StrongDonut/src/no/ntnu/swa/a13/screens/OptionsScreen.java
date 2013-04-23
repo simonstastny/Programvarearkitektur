@@ -70,7 +70,7 @@ public class OptionsScreen implements Screen {// A the game class, it will hold 
 				game.setScreen(MyGdxGame.gameScreen);
 			}
 			if(touchPos.y > MyGdxGame.hR/4 && touchPos.y < MyGdxGame.hR/2){
-				MyGdxGame.gameScreen = new GameScreen(game); 
+				MyGdxGame.gameScreen = new GameScreen(game, MyGdxGame.getLandscapeGenerator()); 
 				game.setScreen(MyGdxGame.gameScreen);
 			}
 			if(touchPos.y < MyGdxGame.hR*3/4 && touchPos.y > MyGdxGame.hR/2){

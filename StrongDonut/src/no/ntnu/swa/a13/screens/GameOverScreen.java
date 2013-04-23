@@ -61,7 +61,7 @@ public class GameOverScreen implements Screen {// A the game class, it will hold
 			touchPos.set(Gdx.input.getX(),Gdx.input.getY(), 0);
 //			camera.unproject(touchPos);
 			if(touchPos.y < MyGdxGame.hR/4){
-				MyGdxGame.gameScreen = new GameScreen(game); 
+				MyGdxGame.gameScreen = new GameScreen(game,MyGdxGame.getLandscapeGenerator()); 
 				game.setScreen(MyGdxGame.mainMenuScreen);
 			}
 		}
