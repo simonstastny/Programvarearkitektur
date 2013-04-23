@@ -91,7 +91,6 @@ public class GameScreen implements Screen {
 	private Vector2 target, force;
 	private boolean ballExists = false;
 	private boolean destroyBall = false;
-	private boolean destroyPlayer = false;
 	private boolean ballBeingFired = false;
 	private boolean ignoreHit = true;
 	private boolean updateLandscape = false;
@@ -150,36 +149,7 @@ public class GameScreen implements Screen {
 
 		landscape = LandscapeFactory.makeLandscape(new SimonsStupidGenerator());
 
-//		int sliceCounter = 0;
-		BodyDef bd = new BodyDef();
-		bd.position.y = 0;
-		bd.position.x = 0;
-		bd.type = BodyType.StaticBody;
-		landBody = world.createBody(bd);
-		FixtureDef fd = new FixtureDef();
-		fd.restitution = 0.0f;
-		fd.friction = 10.0f;
-		
-		// A floor below the ground made for testing,
-		// stops elements from falling through ground when all ground is destroyed
-		EdgeShape floor = new EdgeShape();
-		fd.shape = floor;
-		floor.set(new Vector2(0,0), new Vector2(MyGdxGame.w,0));
-		landBody.createFixture(fd);
-		floor.dispose();
-		
-		ChainShape landShape = new ChainShape();
-		landVertices = new Vector2[landscape.getSlices().size()];		
-		int it = 0;
-		for (Rectangle slice : landscape.getSlices()){
-			landVertices[it] = new Vector2(slice.x*MyGdxGame.b2dScale,slice.height*MyGdxGame.b2dScale);
-			it++;
-		};
-		landShape.createChain(landVertices);
-		fd.shape = landShape;
-		landBody.createFixture(fd); //static body density does not matter
-		landShape.dispose();
-		
+		landBody = bodyFactory.makeLandmass();
 		
 		world.setContactListener(new ContactListener() {
 			
@@ -220,7 +190,13 @@ public class GameScreen implements Screen {
 							Player.Status stat = MyGdxGame.players[0].causeDamage(100); //FIXME full force by default
 							
 							if(stat == Player.Status.DESTROYED) {
-								destroyPlayer = true;
+								gameOver();
+							}
+						} else {
+							Player.Status stat = MyGdxGame.players[1].causeDamage(100); //FIXME full force by default
+							
+							if(stat == Player.Status.DESTROYED) {
+								gameOver();
 							}
 						}
 						
@@ -491,6 +467,10 @@ public class GameScreen implements Screen {
 
 	}
 	
+	void gameOver() {
+		//FIXME
+	}
+	
 	//We already have a list of players
 	
 //	private void initializePlayers() {	
@@ -532,7 +512,7 @@ public class GameScreen implements Screen {
 			
 		}
 		
-		public Body makeCatapult(Vector2 catPos/*Player player*/) {
+		private Body makeCatapult(Vector2 catPos/*Player player*/) {
 			Body catapult = null;
 			
 			BodyDef bd = new BodyDef();
@@ -571,6 +551,43 @@ public class GameScreen implements Screen {
 //			catapult.setUserData(player); //With recent changes this would make a catapult hold a reference to a player with a reference to a catapult etc.
 			
 			return catapult;
+		}
+		
+		private Body makeLandmass() {
+			
+			Body landMass = null;
+			
+			BodyDef bd = new BodyDef();
+			bd.position.y = 0;
+			bd.position.x = 0;
+			bd.type = BodyType.StaticBody;
+			landMass = world.createBody(bd);
+			FixtureDef fd = new FixtureDef();
+			fd.restitution = 0.0f;
+			fd.friction = 10.0f;
+			
+			// A floor below the ground made for testing,
+			// stops elements from falling through ground when all ground is destroyed
+			EdgeShape floor = new EdgeShape();
+			fd.shape = floor;
+			floor.set(new Vector2(0,0), new Vector2(MyGdxGame.w,0));
+			landMass.createFixture(fd);
+			floor.dispose();
+			
+			ChainShape landShape = new ChainShape();
+			landVertices = new Vector2[landscape.getSlices().size()];		
+			int it = 0;
+			for (Rectangle slice : landscape.getSlices()){
+				landVertices[it] = new Vector2(slice.x*MyGdxGame.b2dScale,slice.height*MyGdxGame.b2dScale);
+				it++;
+			};
+			landShape.createChain(landVertices);
+			fd.shape = landShape;
+			landMass.createFixture(fd); //static body density does not matter
+			landShape.dispose();
+			
+			
+			return landMass;
 		}
 		
 		
