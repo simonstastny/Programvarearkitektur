@@ -68,8 +68,11 @@ public class GameScreen implements Screen {
 
 	// the SpriteBatch takes care of rendering images
 	private SpriteBatch batch;
-//	private PolygonSpriteBatch polygonBatch;
 	private ShapeRenderer renderer;
+	
+	//the (crude) buttons for "fire" and "menu"
+	private Texture gameButtonTex;
+	private TextureRegion menuButton, fireButton;
 
 	//Catapult textures
 	private Texture catapultTex;
@@ -117,7 +120,12 @@ public class GameScreen implements Screen {
 		renderer = new ShapeRenderer();
 		renderer.setTransformMatrix(MyGdxGame.scalingMatrix);
 		batch.setTransformMatrix(MyGdxGame.scalingMatrix);
-
+		
+		gameButtonTex = new Texture(Gdx.files.internal("data/game_buttons.png"));
+		gameButtonTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		menuButton = new TextureRegion(gameButtonTex, 0, 0, 256, 128);
+		fireButton = new TextureRegion(gameButtonTex, 256, 0, 256, 128);
+		
 		catapultTex = new Texture(Gdx.files.internal("data/mangonel.png"));
 		catapultTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);// not sure if filter is needed
 		
@@ -179,7 +187,7 @@ public class GameScreen implements Screen {
 			@Override
 			public void beginContact(Contact contact) {
 				//solving problems with boolean variables is so pretty
-				//the following function boolean checks are there to prevent catapults from self-destructing
+				//the following function's boolean checks are there to prevent catapults from self-destructing
 				if(!ignoreHit){
 					
 					if(PhysicsHelper.tankHit(contact)) {
@@ -332,6 +340,9 @@ public class GameScreen implements Screen {
 		
 		//The catapult is now either red or black, red or invisible, no other colors work.		
 		batch.begin();
+		batch.setColor(Color.WHITE);
+		batch.draw(menuButton,0,MyGdxGame.hR*7/8,MyGdxGame.wR/8,MyGdxGame.hR/8);
+		batch.draw(fireButton,MyGdxGame.wR*7/8,MyGdxGame.hR*7/8,MyGdxGame.wR/8,MyGdxGame.hR/8);
 //		batch.setColor(Color.CLEAR);
 		batch.setColor(Color.BLACK);
 		batch.draw(currentCata1Frame,catapult1.getPosition().x/MyGdxGame.b2dScale, catapult1.getPosition().y/MyGdxGame.b2dScale, 0, 0, catapultWidthPx, catapultHeightPx, catapultSize, catapultSize, (int)(catapult1.getAngle()*57.29578));
@@ -341,6 +352,8 @@ public class GameScreen implements Screen {
 		batch.end();
 
 		//FIXME wifikundace
+		
+		//touch-functionality of gameScreen is made here, 
 		//Because there is little time left and the game should be playable, a lot of modifiability is sacrificed right here:
 		if(Gdx.input.justTouched()/*isTouched()*/){
 			
@@ -406,8 +419,8 @@ public class GameScreen implements Screen {
 	private void setForce(float posX, float posY){
 		System.out.println("Currently active player: "+MyGdxGame.activePlayer);//TODO remove this
 		System.out.println("Active player Xforce: "+Math.abs(target.x-(MyGdxGame.players[MyGdxGame.activePlayer].getCatapult().getPosition().x)));//TODO remove this
-		this.force.x = Math.abs(posX-(MyGdxGame.players[MyGdxGame.activePlayer].getCatapult().getPosition().x));
-		this.force.y = Math.abs(posY-MyGdxGame.players[MyGdxGame.activePlayer].getCatapult().getPosition().y);
+		this.force.x = Math.abs(posX-(MyGdxGame.players[MyGdxGame.activePlayer].getCatapult().getPosition().x))*1.5f;
+		this.force.y = Math.abs(posY-MyGdxGame.players[MyGdxGame.activePlayer].getCatapult().getPosition().y)*1.5f;
 	}
 	private void fireBall(){
 		ignoreHit = true;
