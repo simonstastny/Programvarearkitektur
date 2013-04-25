@@ -49,6 +49,7 @@ public class OptionsScreen implements Screen {// A the game class, it will hold 
 
 	@Override
 	public void render(float delta) {
+		Gdx.gl.glClearColor(1f, 1f, 1f, 0f);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		batch.setProjectionMatrix(camera.combined);

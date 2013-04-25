@@ -71,12 +71,12 @@ public class GameScreen implements Screen {
 	private float animationTimer;
 	private float animationDelta = 0.02f;
 	//numbers needed to get the right size catapults
-	private int catapultHeightPx = 273;
-	private int catapultWidthPx = 448;
-	private int catapultWidthIncrement = 450;
-	private int catapultMap1stRow = 95;
-	private int catapultMap2ndRow = 545;
-	private float catapultSize = 0.1f; //for scaling down the texture
+	private int catapultHeightPx =(int) 273/2;
+	private int catapultWidthPx = 448/2;
+	private int catapultWidthIncrement = 450/2;
+	private int catapultMap1stRow =(int) 95/2;
+	private int catapultMap2ndRow =(int) 545/2;
+	private float catapultSize = 0.2f; //for scaling down the texture
 	
 	private Landscape landscape;
 	private Vector2[] landVertices;
