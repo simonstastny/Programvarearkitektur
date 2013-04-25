@@ -3,7 +3,7 @@ package no.ntnu.swa.a13;
 import no.ntnu.swa.a13.landscape.LandscapeGenerator;
 import no.ntnu.swa.a13.landscape.NetherlandsGenerator;
 import no.ntnu.swa.a13.landscape.PolandGenerator;
-import no.ntnu.swa.a13.landscape.SimonsStupidGenerator;
+import no.ntnu.swa.a13.landscape.CzechGenerator;
 import no.ntnu.swa.a13.screens.*;
 
 import com.badlogic.gdx.Game;
@@ -33,7 +33,7 @@ public class MyGdxGame extends Game {
 		} else if (rand < 0.5d) {
 			return new PolandGenerator(); 
 		} else {
-			return new SimonsStupidGenerator(); 
+			return new CzechGenerator(); 
 		}
 	}
 	

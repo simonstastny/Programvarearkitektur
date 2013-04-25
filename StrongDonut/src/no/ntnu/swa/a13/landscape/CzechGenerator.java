@@ -1,6 +1,6 @@
 package no.ntnu.swa.a13.landscape;
 
-public class SimonsStupidGenerator implements LandscapeGenerator {
+public class CzechGenerator implements LandscapeGenerator {
 
 	double rand = 0;
 
