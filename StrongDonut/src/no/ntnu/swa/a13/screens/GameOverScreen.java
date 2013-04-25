@@ -25,7 +25,7 @@ public class GameOverScreen implements Screen {// A the game class, it will hold
 	
 	//Menu elements need textures
 	private Texture newGameTex;
-	private TextureRegion mainMenuButton, newGameButton, optionsButton, exitButton;
+	private TextureRegion mainMenuButton;
 	
 	
 	

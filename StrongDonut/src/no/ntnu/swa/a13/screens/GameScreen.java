@@ -1,22 +1,11 @@
 package no.ntnu.swa.a13.screens;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import sun.font.CreatedFontTracker;
-
-import no.ntnu.swa.a13.FreeForAllStrategy;
-import no.ntnu.swa.a13.GameLogic;
 import no.ntnu.swa.a13.MyGdxGame;
 import no.ntnu.swa.a13.PhysicsHelper;
 import no.ntnu.swa.a13.Player;
 import no.ntnu.swa.a13.landscape.Landscape;
 import no.ntnu.swa.a13.landscape.LandscapeFactory;
 import no.ntnu.swa.a13.landscape.LandscapeGenerator;
-import no.ntnu.swa.a13.landscape.NetherlandsGenerator;
-import no.ntnu.swa.a13.landscape.PolandGenerator;
-import no.ntnu.swa.a13.landscape.SimonsStupidGenerator;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -193,7 +182,7 @@ public class GameScreen implements Screen {
 					if(PhysicsHelper.tankHit(contact)) {
 						// someone's hit
 						
-						System.out.println("TANK HIT ---------------");
+//						System.out.println("TANK HIT ---------------");
 						
 						Fixture tank = PhysicsHelper.getTank(contact.getFixtureA(), contact.getFixtureB());
 						
@@ -373,7 +362,7 @@ public class GameScreen implements Screen {
 //					fireBall();
 				}
 			}else{
-				System.out.println(""+touchPos.x+", "+touchPos.y);//TODO remove this
+//				System.out.println(""+touchPos.x+", "+touchPos.y);//TODO remove this
 //				MyGdxGame.players[0].setCoordinates(catapult1.getPosition());
 //				MyGdxGame.players[1].setCoordinates(catapult2.getPosition());
 				setTarget(touchPos.x, touchPos.y);
@@ -417,8 +406,8 @@ public class GameScreen implements Screen {
 		setForce(posX,posY);
 	}
 	private void setForce(float posX, float posY){
-		System.out.println("Currently active player: "+MyGdxGame.activePlayer);//TODO remove this
-		System.out.println("Active player Xforce: "+Math.abs(target.x-(MyGdxGame.players[MyGdxGame.activePlayer].getCatapult().getPosition().x)));//TODO remove this
+//		System.out.println("Currently active player: "+MyGdxGame.activePlayer);//TODO remove this
+//		System.out.println("Active player Xforce: "+Math.abs(target.x-(MyGdxGame.players[MyGdxGame.activePlayer].getCatapult().getPosition().x)));//TODO remove this
 		this.force.x = Math.abs(posX-(MyGdxGame.players[MyGdxGame.activePlayer].getCatapult().getPosition().x))*1.5f;
 		this.force.y = Math.abs(posY-MyGdxGame.players[MyGdxGame.activePlayer].getCatapult().getPosition().y)*1.5f;
 	}
@@ -519,10 +508,10 @@ public class GameScreen implements Screen {
 			ballBody.setUserData(PhysicsHelper.BALL);
 			ballShape.dispose();
 			ballExists = true;
-			System.out.println("Catapult1 is at: "+catapult1.getPosition().x+", "+catapult1.getPosition().y);//TODO remove this
-			System.out.println("Catapult2 is at: "+catapult2.getPosition().x+", "+catapult2.getPosition().y);//TODO remove this
-			System.out.println("Ball made at: "+ballBody.getPosition().x+", "+ballBody.getPosition().y);//TODO remove this
-			System.out.println("Ball force at: "+force.x+", "+force.y);//TODO remove this
+//			System.out.println("Catapult1 is at: "+catapult1.getPosition().x+", "+catapult1.getPosition().y);//TODO remove this
+//			System.out.println("Catapult2 is at: "+catapult2.getPosition().x+", "+catapult2.getPosition().y);//TODO remove this
+//			System.out.println("Ball made at: "+ballBody.getPosition().x+", "+ballBody.getPosition().y);//TODO remove this
+//			System.out.println("Ball force at: "+force.x+", "+force.y);//TODO remove this
 			
 			return ballBody;
 			
